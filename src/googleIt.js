@@ -39,12 +39,33 @@ export function openInBrowser(open, results) {
 export function getSnippet(elem) {
   // recursive function to get "all" the returned data from Google
   function findData(child) {
+    if (child.name == 'span' && child.attribs['class'].includes('rQMQod')) return '';
     if (!child.data) {
       return child.children.map((c) => c.data || findData(c));
     }
     return child.data;
   }
 
+  
+
+  // Issue with linter wanting "new" before "Array"
+  // in this case, the casting is legit, we don't want a new array
+  // eslint-disable-next-line unicorn/new-for-builtins
+  return elem.children && elem.children.length > 0 ? elem.children.map((child) => Array(findData(child)).join('')).join('').replace(/(^[,\s]+)|([,\s]+$)/g, '') : '';
+}
+
+export function getTimeSnippet(elem) {
+  // recursive function to get "all" the returned data from Google
+  function findData(child) {
+    //if (child.name == 'div' || !child.children) return '';
+    if (!child.data) {
+      return child.children.map((c) => c.data || findData(c));
+    }
+    return child.data;
+  }
+
+  
+  
   // Issue with linter wanting "new" before "Array"
   // in this case, the casting is legit, we don't want a new array
   // eslint-disable-next-line unicorn/new-for-builtins
@@ -92,6 +113,7 @@ export function getResults({
   let results = [];
 
   const titles = $(getTitleSelector(titleSelector)).contents();
+
   titles.each((index, elem) => {
     if (elem.data) {
       results.push({ title: elem.data });
@@ -112,6 +134,14 @@ export function getResults({
     if (index < results.length) {
       results[index] = Object.assign(results[index], {
         snippet: getSnippet(elem),
+      });
+    }
+  });
+
+  $(getSnippetSelector(snippetSelector) + ' span.rQMQod:nth-child(1)').map((index, elem) => {
+    if (index < results.length) {
+      results[index] = Object.assign(results[index], {
+        timeSnippet: getTimeSnippet(elem)//getSnippet(elem),
       });
     }
   });
