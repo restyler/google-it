@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "name": "google-it",
   "version": "1.6.1",
   "description": "A CLI and Node.js library to help retrieve, display, and store Google search results",
