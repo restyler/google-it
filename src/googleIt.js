@@ -19,7 +19,7 @@ const {
   saveResponse,
 } = require('./utils');
 
-export function errorTryingToOpen(error, stdout, stderr) {
+const errorTryingToOpen = (error, stdout, stderr) => {
   if (error) {
     console.log(`Error trying to open link in browser: ${error}`);
     console.log(`stdout: ${stdout}`);
@@ -27,7 +27,7 @@ export function errorTryingToOpen(error, stdout, stderr) {
   }
 }
 
-export function openInBrowser(open, results) {
+const openInBrowser = (open, results) => {
   if (open !== undefined) {
     // open is the first X number of links to open
     results.slice(0, open).forEach((result) => {
@@ -36,7 +36,7 @@ export function openInBrowser(open, results) {
   }
 }
 
-export function getSnippet(elem) {
+const getSnippet = (elem) => {
   // recursive function to get "all" the returned data from Google
   function findData(child) {
     if (child.name == 'span' && child.attribs['class'].includes('rQMQod')) return '';
@@ -54,7 +54,7 @@ export function getSnippet(elem) {
   return elem.children && elem.children.length > 0 ? elem.children.map((child) => Array(findData(child)).join('')).join('').replace(/(^[,\s]+)|([,\s]+$)/g, '') : '';
 }
 
-export function getTimeSnippet(elem) {
+const getTimeSnippet = (elem) => {
   // recursive function to get "all" the returned data from Google
   function findData(child) {
     //if (child.name == 'div' || !child.children) return '';
@@ -72,7 +72,7 @@ export function getTimeSnippet(elem) {
   return elem.children && elem.children.length > 0 ? elem.children.map((child) => Array(findData(child)).join('')).join('') : '';
 }
 
-export function display(results, disableConsole, onlyUrls) {
+const display = (results, disableConsole, onlyUrls) => {
   logIt('\n', disableConsole);
   results.forEach((result) => {
     if (onlyUrls) {
@@ -88,7 +88,7 @@ export function display(results, disableConsole, onlyUrls) {
   });
 }
 
-export const parseGoogleSearchResultUrl = (url) => {
+const parseGoogleSearchResultUrl = (url) => {
   if (!url) {
     return undefined;
   }
@@ -98,7 +98,7 @@ export const parseGoogleSearchResultUrl = (url) => {
   return url;
 };
 
-export function getResults({
+const getResults = ({
   data,
   noDisplay,
   disableConsole,
@@ -108,7 +108,7 @@ export function getResults({
   snippetSelector,
   resultStatsSelector,
   cursorSelector,
-}) {
+}) => {
   const $ = cheerio.load(data);
   let results = [];
 
@@ -166,7 +166,7 @@ export function getResults({
   return { results, stats };
 }
 
-export function getResponse({
+const getResponse = ({
   fromFile: filePath,
   fromString,
   options,
@@ -177,7 +177,7 @@ export function getResponse({
   start,
   includeSites,
   excludeSites,
-}) {
+}) => {
   // eslint-disable-next-line consistent-return
   return new Promise((resolve, reject) => {
     if (filePath) {
@@ -203,7 +203,7 @@ export function getResponse({
   });
 }
 
-function googleIt(config) {
+const googleIt = (config) => {
   const {
     output,
     open,
@@ -246,4 +246,4 @@ function googleIt(config) {
   });
 }
 
-export default googleIt;
+module.exports = googleIt;
