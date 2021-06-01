@@ -129,22 +129,52 @@ const getResults = ({
       });
     }
   });
-
+  //let fs = require('fs')
+  
+  //console.log('snippet selector', getSnippetSelector(snippetSelector))
   $(getSnippetSelector(snippetSelector)).map((index, elem) => {
+    //fs.writeFileSync('snippet'+Math.random()+'.html', cheerio.load(elem).html());
+    let $snippet = cheerio.load(elem)
+
     if (index < results.length) {
       results[index] = Object.assign(results[index], {
         snippet: getSnippet(elem),
       });
+
+      if ($snippet('.v9i61e').length) {
+        results[index] = Object.assign(results[index], {
+          metaHtml: $snippet('.v9i61e').html(),
+        });
+        let rating = $snippet('.oqSTJd')
+        if (rating.length) {
+          Object.assign(results[index], {
+            rating: rating.text()
+          });
+          
+        }
+        let votes = $snippet('.Eq0J8:last-child')
+        if (votes.length) {
+          Object.assign(results[index], {
+            votesCount: votes.text().replace(/\D+/g, '')
+          });
+        }
+      }
+
+      let timeSnippetSelector = 'div:not(.v9i61e) > div > span.rQMQod:nth-child(1)'
+      if ($snippet(timeSnippetSelector).length) {
+        results[index] = Object.assign(results[index], {
+          timeSnippet: $snippet(timeSnippetSelector).html(),
+        });
+
+        /*if (results[index].timeSnippet == 'Rating') {
+          console.error('err', $snippet.html());
+          fs.writeFileSync('err_snippet'+Math.random()+'.html', $snippet.html());
+        }*/
+      }
+
     }
   });
 
-  $(getSnippetSelector(snippetSelector) + ' span.rQMQod:nth-child(1)').map((index, elem) => {
-    if (index < results.length) {
-      results[index] = Object.assign(results[index], {
-        timeSnippet: getTimeSnippet(elem)//getSnippet(elem),
-      });
-    }
-  });
 
   if (onlyUrls) {
     results = results.map((r) => ({ link: r.link }));
