@@ -1,3 +1,3 @@
-import googleIt from './googleIt';
+const googleIt  = require('./googleIt');
 
 module.exports = googleIt;
