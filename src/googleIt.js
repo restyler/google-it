@@ -2,11 +2,11 @@
 /* eslint-disable array-callback-return */
 const request = require('request');
 const fs = require('fs');
+const { URL } = require('url');
 const querystring = require('querystring');
 const cheerio = require('cheerio');
 require('colors');
 const { exec } = require('child_process');
-
 const {
   getDefaultRequestOptions,
   getTitleSelector,
@@ -39,7 +39,7 @@ const openInBrowser = (open, results) => {
 const getSnippet = (elem) => {
   // recursive function to get "all" the returned data from Google
   function findData(child) {
-    if (child.name == 'span' && child.attribs['class'].includes('rQMQod')) return '';
+    if (child.name == 'span' && child.attribs['class'] && child.attribs['class'].includes('rQMQod')) return '';
     if (!child.data) {
       return child.children.map((c) => c.data || findData(c));
     }
@@ -92,6 +92,11 @@ const parseGoogleSearchResultUrl = (url) => {
   if (!url) {
     return undefined;
   }
+  if (url.startsWith('http://www.google.com/url?')) {
+    const urlObject = new URL(url);
+    const queryObject = querystring.parse(urlObject.search.substr(1));
+    return queryObject.url;
+  }
   if (url.charAt(0) === '/') {
     return querystring.parse(url).url;
   }
@@ -129,7 +134,7 @@ const getResults = ({
       });
     }
   });
-  //let fs = require('fs')
+  let fs = require('fs')
   
   //console.log('snippet selector', getSnippetSelector(snippetSelector))
   $(getSnippetSelector(snippetSelector)).map((index, elem) => {
@@ -160,16 +165,16 @@ const getResults = ({
         }
       }
 
-      let timeSnippetSelector = 'div:not(.v9i61e) > div > span.rQMQod:nth-child(1)'
-      if ($snippet(timeSnippetSelector).length) {
+      let $timeSnippet = $snippet('div:not(.v9i61e) > div > span.rQMQod:nth-child(1)')
+      if ($timeSnippet.length && /\d/.test($timeSnippet.html())) {
         results[index] = Object.assign(results[index], {
-          timeSnippet: $snippet(timeSnippetSelector).html(),
+          timeSnippet: $timeSnippet.html(),
         });
 
-        /*if (results[index].timeSnippet == 'Rating') {
-          console.error('err', $snippet.html());
-          fs.writeFileSync('err_snippet'+Math.random()+'.html', $snippet.html());
-        }*/
+        //if (results[index].timeSnippet == 'Premier League') {
+        //  console.error('err', $snippet.html());
+        //  fs.writeFileSync('err_snippet'+Math.random()+'.html', $snippet.html());
+        //}
       }
 
     }
