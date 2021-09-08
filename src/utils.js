@@ -52,7 +52,7 @@ const getDefaultRequestOptions = ({
 });
 
 const titleSelector = 'div.ZINbbc > div:nth-child(1) > a > h3';
-const linkSelector = 'div.ZINbbc > div:nth-child(1) > a';
+const linkSelector = 'div.ZINbbc > div:nth-child(1) > a:not(.C8nzq)';
 const snippetSelector = '#main > div > div > div > div:not(.v9i61e) > div.AP7Wnd';
 const resultStatsSelector = '#resultStats';
 const cursorSelector = '#nav > tbody > tr > td.cur';
