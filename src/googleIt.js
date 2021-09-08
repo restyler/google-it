@@ -228,13 +228,25 @@ const getResponse = ({
     const defaultOptions = getDefaultRequestOptions({
       limit, query, userAgent, start, includeSites, excludeSites,
     });
-    request({ ...defaultOptions, ...options }, (error, response, body) => {
+    
+    let abortController
+    let reqInstance = request({ ...defaultOptions, ...options }, (error, response, body) => {
       if (error) {
         return reject(new Error(`Error making web request: ${error}`));
       }
       saveResponse(response, htmlFileOutputPath);
+
+      if (abortController) {
+        clearTimeout(abortController)
+      }
       return resolve({ body, response });
     });
+
+    abortController = setTimeout(() => {
+      console.log('aborting req!')
+      reqInstance.abort()
+      return reject(new Error(`Timeout making web request`))
+    }, options && options.timeout ? options.timeout : 15000)
   });
 }
 
