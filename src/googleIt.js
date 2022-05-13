@@ -265,6 +265,10 @@ const googleIt = (config) => {
   } = config;
   return new Promise((resolve, reject) => {
     getResponse(config).then(({ body, response }) => {
+
+      if (body.includes('if(solveSimpleChallenge) {solveSimpleChalle')) {
+        return reject(new Error(`captcha detected`));
+      }
       const { results, stats } = getResults({
         data: body,
         noDisplay: config['no-display'],
