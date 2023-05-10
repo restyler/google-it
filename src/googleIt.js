@@ -17,6 +17,7 @@ const {
   logIt,
   saveToFile,
   saveResponse,
+  titlefinder
 } = require('./utils');
 
 const errorTryingToOpen = (error, stdout, stderr) => {
@@ -117,11 +118,11 @@ const getResults = ({
   const $ = cheerio.load(data);
   let results = [];
 
-  const titles = $(getTitleSelector(titleSelector)).contents();
+  const titles = $(getTitleSelector(titleSelector)).find(titlefinder);
 
   titles.each((index, elem) => {
-    if (elem.data) {
-      results.push({ title: elem.data });
+    if (elem.children[0].data) {
+      results.push({ title: elem.children[0].data });
     } else {
       results.push({ title: elem.children[0].data });
     }
@@ -269,6 +270,12 @@ const googleIt = (config) => {
       if (body.includes('if(solveSimpleChallenge) {solveSimpleChalle')) {
         return reject(new Error(`captcha detected`));
       }
+
+      //let path = `body${new Date}.html`;
+
+      //console.log('writing data to fs: ' + path);
+      //fs.writeFileSync(path, body);
+
       const { results, stats } = getResults({
         data: body,
         noDisplay: config['no-display'],
