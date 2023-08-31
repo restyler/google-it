@@ -20,6 +20,10 @@ const {
   titlefinder
 } = require('./utils');
 
+function stripTags(input) {
+  return input.replace(/<\/?[^>]+(>|$)/g, "").replaceAll('&nbsp;', '');
+}
+
 const errorTryingToOpen = (error, stdout, stderr) => {
   if (error) {
     console.log(`Error trying to open link in browser: ${error}`);
@@ -148,9 +152,34 @@ const getResults = ({
       });
 
       if ($snippet('.v9i61e').length) {
+        //console.log('html1', $snippet('.v9i61e').html(), 'text1', $snippet('.v9i61e').text());
         results[index] = Object.assign(results[index], {
           metaHtml: $snippet('.v9i61e').html(),
         });
+        // search for links in next sibling div
+        let linksContainer = $snippet('.v9i61e').next();
+        let links = linksContainer.find('a');
+        if (links.length) {
+          // rewrite snippet with clean version without link ugly text
+          //console.log(`snippet `, $snippet('.v9i61e').text());
+          // for some magical reason $snippet('.v9i61e').text() returns more text than .html() 
+          results[index].snippet = stripTags(results[index].metaHtml);
+          delete results[index].metaHtml;
+          
+
+          results[index] = Object.assign(results[index], {
+            pages: links.map((i, el) => {
+              return {
+                link: parseGoogleSearchResultUrl(el.attribs.href),
+                text: $(el).text()
+              }
+            }).toArray()
+          });
+        }
+
+
+
+
         let rating = $snippet('.oqSTJd')
         if (rating.length) {
           Object.assign(results[index], {
