@@ -123,6 +123,7 @@ const getResults = ({
   let results = [];
 
   const titles = $(getTitleSelector(titleSelector)).find(titlefinder);
+  //const titles = $(titlefinder);
 
   titles.each((index, elem) => {
     if (elem.children[0].data) {
@@ -171,7 +172,7 @@ const getResults = ({
             pages: links.map((i, el) => {
               return {
                 link: parseGoogleSearchResultUrl(el.attribs.href),
-                text: $(el).text()
+                title: $(el).text()
               }
             }).toArray()
           });
